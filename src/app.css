@@ -1,0 +1,248 @@
+/* ---------- Theme tokens ---------- */
+:root {
+  --bg: #030803;
+  --bg-2: #061208;
+  --panel: rgba(4, 16, 7, 0.98);
+  --panel-solid: #051107;
+  --fg: #39ff6a;
+  --fg-soft: #9dffb5;
+  --fg-dim: #22a447;
+  --fg-faint: #0f4a1e;
+  --line: #1a7a35;
+  --accent: #d6ffe0;
+  --danger: #ff6b5f;
+  --glow: 0 0 2px rgba(57, 255, 106, 0.75), 0 0 10px rgba(57, 255, 106, 0.3);
+  --box-glow: 0 0 0 1px var(--line), 0 0 18px rgba(57, 255, 106, 0.15);
+  --font-display: 'VT323', 'Share Tech Mono', ui-monospace, monospace;
+  --font-ui: 'Share Tech Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --taskbar-h: 46px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  text-shadow: var(--glow);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  /* No double-tap zoom delay, no pull-to-refresh / rubber-band on the "desktop". */
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+}
+
+a {
+  color: var(--fg-soft);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+a:hover,
+a:focus-visible {
+  color: var(--bg);
+  background: var(--fg);
+  text-shadow: none;
+  outline: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  text-shadow: inherit;
+}
+
+:focus-visible {
+  outline: 1px dashed var(--fg);
+  outline-offset: 2px;
+}
+
+/* Retro scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--fg-dim) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--fg-faint);
+  border: 1px solid var(--fg-dim);
+}
+
+/* ---------- CRT effects ---------- */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10000;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.22) 3px
+    ),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.6) 100%);
+  animation: flicker 6s infinite steps(1);
+  /* Own GPU layer: the flicker only changes opacity, so it never repaints the page. */
+  will-change: opacity;
+}
+.crt-overlay::after {
+  /* slow rolling scan band */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent, rgba(57, 255, 106, 0.04), transparent);
+  /* Animated with transform (compositor only) rather than `top`, which repainted every frame. */
+  animation: roll 8s linear infinite;
+  will-change: transform;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  47% { opacity: 0.94; }
+  48% { opacity: 1; }
+  82% { opacity: 0.97; }
+}
+@keyframes roll {
+  from { transform: translateY(-120px); }
+  to { transform: translateY(100vh); }
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-overlay,
+  .crt-overlay::after {
+    animation: none;
+  }
+}
+
+/* ---------- Shared window content styles ---------- */
+.prompt {
+  margin: 0 0 14px;
+  color: var(--fg-dim);
+  font-size: 14px;
+  word-break: break-all;
+}
+.prompt .user {
+  color: var(--fg);
+}
+.prompt .cmd {
+  color: var(--fg-soft);
+}
+
+.h-display {
+  font-family: var(--font-display);
+  font-weight: normal;
+  letter-spacing: 1px;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.muted {
+  color: var(--fg-dim);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tag {
+  border: 1px solid var(--line);
+  padding: 1px 8px;
+  font-size: 13px;
+  color: var(--fg-soft);
+  background: rgba(57, 255, 106, 0.05);
+}
+
+ul.bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.bullets li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 8px;
+}
+ul.bullets li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: var(--fg-dim);
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  background: var(--fg);
+  vertical-align: text-bottom;
+  animation: blink 1s steps(1) infinite;
+  box-shadow: var(--glow);
+}
+
+.btn {
+  background: transparent;
+  border: 1px solid var(--fg-dim);
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.btn:hover,
+.btn:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  outline: none;
+}
+
+/* ---------- Print ---------- */
+.print-only {
+  display: none;
+}
+@media print {
+  html,
+  body {
+    background: #fff;
+    color: #000;
+    text-shadow: none;
+    overflow: visible;
+    height: auto;
+  }
+  .screen-only,
+  .crt-overlay {
+    display: none !important;
+  }
+  .print-only {
+    display: block;
+  }
+}
